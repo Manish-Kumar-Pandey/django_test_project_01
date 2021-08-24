@@ -4,7 +4,10 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_text
+
 
 # Create your views here.
 def home(request):
@@ -50,6 +53,14 @@ def signin(request):
             return redirect('home')
 
     return render(request,"auth/signin.html")
+
+def activate(request,uidb64,token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        myuser = User.objects.get(pk=uid)
+    except (TypeError,ValueError,OverflowError,User.DoesNotExist):
+        myuser = None
+
 
 def signout(request):
     logout(request)
